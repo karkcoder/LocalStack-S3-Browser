@@ -1,4 +1,4 @@
-/* Modern LocalStack S3 File Explorer Styles */
+/* Modern LocalStack S3 File Explorer Styles - Dark Theme */
 
 * {
   margin: 0;
@@ -9,8 +9,8 @@
 body {
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
-  background-color: #f8fafc;
-  color: #334155;
+  background-color: #1a1a1a;
+  color: #e5e7eb;
   line-height: 1.6;
   width: 100vw;
   height: 100vh;
@@ -19,10 +19,10 @@ body {
 
 /* Header */
 .header {
-  background: #475569;
-  color: white;
+  background: #2d2d2d;
+  color: #ffffff;
   padding: 1rem 2rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .header-content {
@@ -44,16 +44,16 @@ body {
 
 /* Connection Settings */
 .connection-settings {
-  background: white;
+  background: #262626;
   padding: 1rem 2rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid #404040;
 }
 
 .connection-settings h2 {
   font-size: 1.125rem;
   font-weight: 600;
   margin-bottom: 0.75rem;
-  color: #1e293b;
+  color: #f3f4f6;
 }
 
 .settings-grid {
@@ -74,25 +74,27 @@ body {
   font-size: 0.875rem;
   font-weight: 500;
   margin-bottom: 0.25rem;
-  color: #374151;
+  color: #d1d5db;
 }
 
 .input-group input {
   padding: 0.5rem 0.75rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid #525252;
   border-radius: 0.375rem;
   font-size: 0.875rem;
+  background-color: #333333;
+  color: #e5e7eb;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .input-group input:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
 }
 
 .btn-connect {
-  background: #22c55e;
+  background: #059669;
   color: white;
   border: none;
   padding: 0.5rem 1.5rem;
@@ -103,7 +105,7 @@ body {
 }
 
 .btn-connect:hover {
-  background: #16a34a;
+  background: #047857;
 }
 
 /* Main Content */
@@ -124,9 +126,9 @@ body {
 
 /* Panels */
 .panel {
-  background: white;
+  background: #2d2d2d;
   border-radius: 0.5rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #404040;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -134,17 +136,17 @@ body {
 
 .panel-header {
   padding: 1rem 1.5rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid #404040;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #f8fafc;
+  background: #333333;
 }
 
 .panel-header h3 {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #1e293b;
+  color: #f3f4f6;
 }
 
 .panel-actions {
@@ -159,13 +161,13 @@ body {
   padding: 0.25rem;
   border-radius: 0.25rem;
   cursor: pointer;
-  color: #64748b;
+  color: #9ca3af;
   transition: background-color 0.2s, color 0.2s;
 }
 
 .btn-icon:hover {
-  background: #e2e8f0;
-  color: #334155;
+  background: #404040;
+  color: #e5e7eb;
 }
 
 /* Buckets Panel */
@@ -175,7 +177,7 @@ body {
 
 .create-bucket-section {
   padding: 1rem 1.5rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid #404040;
   display: flex;
   gap: 0.5rem;
 }
@@ -183,19 +185,21 @@ body {
 .create-bucket-section input {
   flex: 1;
   padding: 0.5rem 0.75rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid #525252;
   border-radius: 0.375rem;
   font-size: 0.875rem;
+  background-color: #333333;
+  color: #e5e7eb;
 }
 
 .create-bucket-section input:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
 }
 
 .btn-create {
-  background: #3b82f6;
+  background: #2563eb;
   color: white;
   border: none;
   padding: 0.5rem 1rem;
@@ -212,7 +216,7 @@ body {
 }
 
 .btn-create:hover {
-  background: #2563eb;
+  background: #1d4ed8;
 }
 
 .buckets-list {
@@ -227,32 +231,33 @@ body {
   padding: 0.75rem 1.5rem;
   cursor: pointer;
   transition: background-color 0.2s;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid #404040;
 }
 
 .bucket-item:hover {
-  background: #f8fafc;
+  background: #333333;
 }
 
 .bucket-item.active {
-  background: #dbeafe;
-  border-right: 3px solid #3b82f6;
+  background: #374151;
+  border-right: 3px solid #60a5fa;
 }
 
 .bucket-item i {
   margin-right: 0.75rem;
-  color: #64748b;
+  color: #9ca3af;
   font-size: 1.25rem;
 }
 
 .bucket-name {
   flex: 1;
   font-weight: 500;
+  color: #e5e7eb;
 }
 
 .bucket-date {
   font-size: 0.75rem;
-  color: #64748b;
+  color: #9ca3af;
   margin-top: 0.25rem;
 }
 
@@ -270,14 +275,14 @@ body {
 /* Files Panel */
 .breadcrumb {
   font-size: 0.875rem;
-  color: #64748b;
+  color: #9ca3af;
   display: flex;
   align-items: center;
   gap: 0.25rem;
 }
 
 .btn-upload {
-  background: #f59e0b;
+  background: #d97706;
   color: white;
   border: none;
   padding: 0.5rem 1rem;
@@ -289,7 +294,7 @@ body {
 }
 
 .btn-upload:hover {
-  background: #d97706;
+  background: #b45309;
 }
 
 .files-list {
@@ -305,7 +310,7 @@ body {
   align-items: center;
   justify-content: center;
   flex: 1;
-  color: #94a3b8;
+  color: #6b7280;
 }
 
 .empty-state i {
@@ -325,11 +330,11 @@ body {
   grid-template-columns: 1fr 100px 150px 100px;
   gap: 1rem;
   padding: 0.75rem 1.5rem;
-  background: #f8fafc;
-  border-bottom: 1px solid #e2e8f0;
+  background: #333333;
+  border-bottom: 1px solid #404040;
   font-size: 0.875rem;
   font-weight: 600;
-  color: #374151;
+  color: #d1d5db;
 }
 
 #files-body {
@@ -343,13 +348,13 @@ body {
   grid-template-columns: 1fr 100px 150px 100px;
   gap: 1rem;
   padding: 0.75rem 1.5rem;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid #404040;
   transition: background-color 0.2s;
   align-items: center;
 }
 
 .file-item:hover {
-  background: #f8fafc;
+  background: #333333;
 }
 
 .file-name {
@@ -357,16 +362,17 @@ body {
   align-items: center;
   gap: 0.5rem;
   font-size: 0.875rem;
+  color: #e5e7eb;
 }
 
 .file-name i {
-  color: #64748b;
+  color: #9ca3af;
 }
 
 .file-size,
 .file-date {
   font-size: 0.875rem;
-  color: #64748b;
+  color: #9ca3af;
 }
 
 .file-actions {
@@ -386,19 +392,19 @@ body {
 }
 
 .btn-download {
-  color: #3b82f6;
+  color: #60a5fa;
 }
 
 .btn-download:hover {
-  background: #dbeafe;
+  background: #374151;
 }
 
 .btn-delete {
-  color: #ef4444;
+  color: #f87171;
 }
 
 .btn-delete:hover {
-  background: #fee2e2;
+  background: #450a0a;
 }
 
 /* Modals */
@@ -408,7 +414,7 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -420,22 +426,23 @@ body {
 }
 
 .modal-content {
-  background: white;
+  background: #2d2d2d;
   border-radius: 0.5rem;
   padding: 2rem;
   max-width: 400px;
   width: 90%;
   text-align: center;
+  border: 1px solid #404040;
 }
 
 .modal-content h3 {
   margin-bottom: 1rem;
-  color: #1e293b;
+  color: #f3f4f6;
 }
 
 .modal-content p {
   margin-bottom: 1.5rem;
-  color: #64748b;
+  color: #9ca3af;
 }
 
 .modal-actions {
@@ -445,8 +452,8 @@ body {
 }
 
 .btn-secondary {
-  background: #e5e7eb;
-  color: #374151;
+  background: #525252;
+  color: #e5e7eb;
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 0.375rem;
@@ -456,11 +463,11 @@ body {
 }
 
 .btn-secondary:hover {
-  background: #d1d5db;
+  background: #404040;
 }
 
 .btn-danger {
-  background: #ef4444;
+  background: #dc2626;
   color: white;
   border: none;
   padding: 0.5rem 1rem;
@@ -471,15 +478,15 @@ body {
 }
 
 .btn-danger:hover {
-  background: #dc2626;
+  background: #b91c1c;
 }
 
 /* Loading Spinner */
 .spinner {
   width: 40px;
   height: 40px;
-  border: 4px solid #e5e7eb;
-  border-top: 4px solid #3b82f6;
+  border: 4px solid #525252;
+  border-top: 4px solid #60a5fa;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 1rem;
@@ -503,24 +510,25 @@ body {
 }
 
 .toast {
-  background: #1e293b;
+  background: #374151;
   color: white;
   padding: 0.75rem 1rem;
   border-radius: 0.375rem;
   margin-bottom: 0.5rem;
   animation: slideIn 0.3s ease-out;
+  border: 1px solid #525252;
 }
 
 .toast.success {
-  background: #22c55e;
+  background: #059669;
 }
 
 .toast.error {
-  background: #ef4444;
+  background: #dc2626;
 }
 
 .toast.warning {
-  background: #f59e0b;
+  background: #d97706;
 }
 
 @keyframes slideIn {
@@ -615,11 +623,11 @@ body {
 /* Tag Tooltip Styles */
 .tag-tooltip {
   position: fixed;
-  background: #1e293b;
+  background: #1f2937;
   color: white;
   border-radius: 0.5rem;
   padding: 0.75rem;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
   z-index: 1200;
   max-width: 300px;
   opacity: 0;
@@ -627,6 +635,7 @@ body {
   pointer-events: none;
   font-size: 0.875rem;
   line-height: 1.4;
+  border: 1px solid #404040;
 }
 
 .tooltip-header {
@@ -637,19 +646,19 @@ body {
 
 .tooltip-header strong {
   display: block;
-  color: #f1f5f9;
+  color: #f3f4f6;
   font-weight: 600;
   word-break: break-all;
 }
 
 .tooltip-content {
-  color: #cbd5e1;
+  color: #d1d5db;
 }
 
 .tags-label {
   font-weight: 500;
   margin-bottom: 0.5rem;
-  color: #e2e8f0;
+  color: #e5e7eb;
 }
 
 .tag-item {
@@ -670,7 +679,7 @@ body {
 }
 
 .tag-value {
-  color: #cbd5e1;
+  color: #d1d5db;
   word-break: break-all;
 }
 
@@ -681,5 +690,5 @@ body {
 }
 
 .file-name:hover .file-name-text {
-  color: #3b82f6;
+  color: #60a5fa;
 }
