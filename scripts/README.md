@@ -12,20 +12,20 @@ Starts LocalStack using Docker Compose with proper configuration.
 
 Sets up the development environment by installing dependencies and starting LocalStack.
 
-### build-app.sh / build-app.bat
+### start-no-gpu.bat
 
-Builds the Electron application for distribution.
+Starts LocalStack without GPU acceleration for systems that don't support it.
 
 ## Usage
 
-### Linux/macOS:
+### Linux/macOS
 
 ```bash
 chmod +x scripts/*.sh
 ./scripts/start-localstack.sh
 ```
 
-### Windows:
+### Windows
 
 ```batch
 scripts\start-localstack.bat

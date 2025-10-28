@@ -1,6 +1,6 @@
 # Quick Start Guide - LocalStack S3 Browser
 
-## 🚀 Quick Setup (5 minutes)
+## Quick Setup (5 minutes)
 
 ### Prerequisites
 
@@ -25,14 +25,14 @@ npm start
 
 That's it! The application should now be running.
 
-## ✅ Quick Test
+## Quick Test
 
-1. **Test Connection**: Click "Test Connection" in the top-right corner
-2. **Create a Bucket**: Enter a name like "my-test-bucket" and click "Create"
-3. **Upload a File**: Select the bucket, click "Upload", and choose any file
-4. **Download the File**: Click the download button next to your uploaded file
+1. Test Connection: Click "Test Connection" in the top-right corner
+2. Create a Bucket: Enter a name like "my-test-bucket" and click "Create"
+3. Upload a File: Select the bucket, click "Upload", and choose any file
+4. Download the File: Click the download button next to your uploaded file
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### LocalStack not starting?
 
@@ -63,13 +63,13 @@ npm install
 npm start
 ```
 
-## 📚 What's Next?
+## What's Next?
 
 - Read the full [README.md](README.md) for detailed documentation
-- Explore the `scripts/` folder for additional utilities
+- Explore the scripts/ folder for additional utilities
 - Check out the Material Design UI components
 
-## 🔧 Development Mode
+## Development Mode
 
 For development with DevTools:
 
@@ -77,7 +77,7 @@ For development with DevTools:
 npm run dev
 ```
 
-## 🛑 Stop Everything
+## Stop Everything
 
 ```bash
 npm run clean
@@ -87,4 +87,4 @@ This stops LocalStack and cleans up Docker resources.
 
 ---
 
-**Need help?** Check the main [README.md](README.md) or the [troubleshooting section](#troubleshooting) above.
+Need help? Check the main [README.md](README.md) or the troubleshooting section above.
