@@ -1,30 +1,26 @@
-// LocalStack S3 Browser - Renderer Process
-class S3Browser {
+// LocalStack S3 File Explorer - Renderer Process
+class S3FileExplorer {
   constructor() {
     this.currentBucket = null;
     this.buckets = [];
     this.objects = [];
+    this.connectionSettings = {
+      endpoint: "http://localhost:4566",
+      region: "us-east-1",
+      accessKey: "test",
+      secretKey: "test",
+    };
     this.init();
   }
 
   init() {
-    this.initializeMaterialize();
     this.setupEventListeners();
-    this.loadBuckets();
-    this.testConnection();
-  }
-
-  initializeMaterialize() {
-    // Initialize modals
-    M.Modal.init(document.querySelectorAll(".modal"));
-
-    // Initialize tooltips if any
-    M.Tooltip.init(document.querySelectorAll(".tooltipped"));
+    this.loadConnectionSettings();
   }
 
   setupEventListeners() {
-    // Connection test
-    document.getElementById("test-connection").addEventListener("click", () => {
+    // Connection
+    document.getElementById("connect-btn").addEventListener("click", () => {
       this.testConnection();
     });
 
@@ -37,7 +33,7 @@ class S3Browser {
       this.loadBuckets();
     });
 
-    // Object operations
+    // File operations
     document.getElementById("upload-file").addEventListener("click", () => {
       this.uploadFile();
     });
@@ -46,57 +42,83 @@ class S3Browser {
       this.loadObjects();
     });
 
-    // Enter key handling for bucket creation
+    // Enter key handling
     document.getElementById("bucket-name").addEventListener("keypress", (e) => {
       if (e.key === "Enter") {
         this.createBucket();
       }
     });
 
-    // Enter key handling for object key
-    document.getElementById("object-key").addEventListener("keypress", (e) => {
-      if (e.key === "Enter") {
-        this.uploadFile();
-      }
+    // Connection settings
+    document.getElementById("endpoint").addEventListener("change", (e) => {
+      this.connectionSettings.endpoint = e.target.value;
+    });
+
+    document.getElementById("region").addEventListener("change", (e) => {
+      this.connectionSettings.region = e.target.value;
+    });
+
+    document.getElementById("access-key").addEventListener("change", (e) => {
+      this.connectionSettings.accessKey = e.target.value;
+    });
+
+    document.getElementById("secret-key").addEventListener("change", (e) => {
+      this.connectionSettings.secretKey = e.target.value;
+    });
+
+    // File input
+    document.getElementById("file-input").addEventListener("change", (e) => {
+      this.handleFileSelection(e.target.files);
+    });
+
+    // Modal events
+    document.getElementById("confirm-cancel").addEventListener("click", () => {
+      this.hideModal("confirm-modal");
     });
   }
 
+  loadConnectionSettings() {
+    document.getElementById("endpoint").value =
+      this.connectionSettings.endpoint;
+    document.getElementById("region").value = this.connectionSettings.region;
+    document.getElementById("access-key").value =
+      this.connectionSettings.accessKey;
+    document.getElementById("secret-key").value =
+      this.connectionSettings.secretKey;
+  }
+
   async testConnection() {
-    this.showLoading("Testing connection to LocalStack...");
+    this.showLoading("Connecting to LocalStack...");
 
     try {
+      // Update connection settings for the backend
+      await window.electronAPI.updateConnectionSettings(
+        this.connectionSettings
+      );
+
       const result = await window.electronAPI.testConnection();
       this.hideLoading();
 
       if (result.success) {
-        this.showConnectionStatus(
-          "Connected to LocalStack successfully",
-          "success"
-        );
-        this.showToast("Connection successful", "green");
+        this.showToast("Connected successfully!", "success");
+        this.loadBuckets();
       } else {
-        this.showConnectionStatus("Failed to connect to LocalStack", "error");
-        this.showToast("Connection failed", "red");
+        this.showToast("Connection failed: " + result.message, "error");
       }
     } catch (error) {
       this.hideLoading();
-      this.showConnectionStatus(`Connection error: ${error.message}`, "error");
-      this.showToast(`Connection error: ${error.message}`, "red");
+      this.showToast(`Connection error: ${error.message}`, "error");
     }
   }
 
   async loadBuckets() {
-    this.showLoading("Loading buckets...");
-
     try {
       const buckets = await window.electronAPI.listBuckets();
       this.buckets = buckets;
       this.renderBuckets();
-      this.hideLoading();
-      this.showToast(`Loaded ${buckets.length} bucket(s)`, "blue");
+      this.showToast(`Loaded ${buckets.length} bucket(s)`, "success");
     } catch (error) {
-      this.hideLoading();
-      this.showToast(`Error loading buckets: ${error.message}`, "red");
+      this.showToast(`Error loading buckets: ${error.message}`, "error");
       console.error("Error loading buckets:", error);
     }
   }
@@ -106,14 +128,14 @@ class S3Browser {
     const bucketName = bucketNameInput.value.trim();
 
     if (!bucketName) {
-      this.showToast("Please enter a bucket name", "orange");
+      this.showToast("Please enter a bucket name", "warning");
       return;
     }
 
     if (!this.isValidBucketName(bucketName)) {
       this.showToast(
         "Invalid bucket name. Use lowercase letters, numbers, and hyphens only.",
-        "red"
+        "error"
       );
       return;
     }
@@ -123,13 +145,12 @@ class S3Browser {
     try {
       await window.electronAPI.createBucket(bucketName);
       bucketNameInput.value = "";
-      M.updateTextFields();
       this.hideLoading();
-      this.showToast(`Bucket "${bucketName}" created successfully`, "green");
+      this.showToast(`Bucket "${bucketName}" created successfully`, "success");
       this.loadBuckets();
     } catch (error) {
       this.hideLoading();
-      this.showToast(`Error creating bucket: ${error.message}`, "red");
+      this.showToast(`Error creating bucket: ${error.message}`, "error");
       console.error("Error creating bucket:", error);
     }
   }
@@ -147,18 +168,18 @@ class S3Browser {
     try {
       await window.electronAPI.deleteBucket(bucketName);
       this.hideLoading();
-      this.showToast(`Bucket "${bucketName}" deleted successfully`, "green");
+      this.showToast(`Bucket "${bucketName}" deleted successfully`, "success");
 
       if (this.currentBucket === bucketName) {
         this.currentBucket = null;
-        this.renderObjects([]);
-        this.hideUploadSection();
+        this.renderFiles([]);
+        this.showEmptyState();
       }
 
       this.loadBuckets();
     } catch (error) {
       this.hideLoading();
-      this.showToast(`Error deleting bucket: ${error.message}`, "red");
+      this.showToast(`Error deleting bucket: ${error.message}`, "error");
       console.error("Error deleting bucket:", error);
     }
   }
@@ -166,11 +187,11 @@ class S3Browser {
   async selectBucket(bucketName) {
     this.currentBucket = bucketName;
     this.updateCurrentBucketDisplay();
-    this.showUploadSection();
+    this.hideEmptyState();
     this.loadObjects();
 
     // Update active bucket in UI
-    document.querySelectorAll(".collection-item").forEach((item) => {
+    document.querySelectorAll(".bucket-item").forEach((item) => {
       item.classList.remove("active");
     });
     document
@@ -181,63 +202,53 @@ class S3Browser {
   async loadObjects() {
     if (!this.currentBucket) return;
 
-    this.showLoading("Loading objects...");
-
     try {
       const objects = await window.electronAPI.listObjects(this.currentBucket);
       this.objects = objects;
-      this.renderObjects(objects);
-      this.hideLoading();
-      this.showToast(`Loaded ${objects.length} object(s)`, "blue");
+      this.renderFiles(objects);
+      this.showToast(`Loaded ${objects.length} file(s)`, "success");
     } catch (error) {
-      this.hideLoading();
-      this.showToast(`Error loading objects: ${error.message}`, "red");
+      this.showToast(`Error loading files: ${error.message}`, "error");
       console.error("Error loading objects:", error);
     }
   }
 
-  async uploadFile() {
+  uploadFile() {
     if (!this.currentBucket) {
-      this.showToast("Please select a bucket first", "orange");
+      this.showToast("Please select a bucket first", "warning");
       return;
     }
 
+    // Trigger file input
+    document.getElementById("file-input").click();
+  }
+
+  async handleFileSelection(files) {
+    if (!files || files.length === 0) return;
+
+    for (const file of files) {
+      await this.uploadSingleFile(file);
+    }
+  }
+
+  async uploadSingleFile(file) {
+    this.showLoading(`Uploading ${file.name}...`);
+
     try {
-      const result = await window.electronAPI.showOpenDialog();
-
-      if (
-        result.canceled ||
-        !result.filePaths ||
-        result.filePaths.length === 0
-      ) {
-        return;
-      }
-
-      const filePath = result.filePaths[0];
-      const fileName = filePath.split(/[\\/]/).pop();
-      const objectKey =
-        document.getElementById("object-key").value.trim() || fileName;
-
-      this.showLoading("Uploading file...");
+      const objectKey = file.name;
 
       await window.electronAPI.uploadFile(
         this.currentBucket,
         objectKey,
-        filePath
+        file.path
       );
-
-      document.getElementById("object-key").value = "";
-      M.updateTextFields();
 
       this.hideLoading();
-      this.showToast(
-        `File "${fileName}" uploaded successfully as "${objectKey}"`,
-        "green"
-      );
+      this.showToast(`File "${file.name}" uploaded successfully`, "success");
       this.loadObjects();
     } catch (error) {
       this.hideLoading();
-      this.showToast(`Error uploading file: ${error.message}`, "red");
+      this.showToast(`Error uploading ${file.name}: ${error.message}`, "error");
       console.error("Error uploading file:", error);
     }
   }
@@ -247,39 +258,38 @@ class S3Browser {
 
     try {
       const result = await window.electronAPI.downloadFile(bucketName, key);
-
       this.hideLoading();
 
       if (result.success && !result.canceled) {
-        this.showToast(`File downloaded to: ${result.path}`, "green");
+        this.showToast(`File downloaded successfully`, "success");
       } else if (result.canceled) {
-        this.showToast("Download canceled", "orange");
+        this.showToast("Download canceled", "warning");
       }
     } catch (error) {
       this.hideLoading();
-      this.showToast(`Error downloading file: ${error.message}`, "red");
+      this.showToast(`Error downloading file: ${error.message}`, "error");
       console.error("Error downloading file:", error);
     }
   }
 
   async deleteObject(bucketName, key) {
     const confirmed = await this.showConfirmDialog(
-      "Delete Object",
+      "Delete File",
       `Are you sure you want to delete "${key}"? This action cannot be undone.`
     );
 
     if (!confirmed) return;
 
-    this.showLoading("Deleting object...");
+    this.showLoading("Deleting file...");
 
     try {
       await window.electronAPI.deleteObject(bucketName, key);
       this.hideLoading();
-      this.showToast(`Object "${key}" deleted successfully`, "green");
+      this.showToast(`File "${key}" deleted successfully`, "success");
       this.loadObjects();
     } catch (error) {
       this.hideLoading();
-      this.showToast(`Error deleting object: ${error.message}`, "red");
+      this.showToast(`Error deleting file: ${error.message}`, "error");
       console.error("Error deleting object:", error);
     }
   }
@@ -289,169 +299,171 @@ class S3Browser {
     bucketsList.innerHTML = "";
 
     if (this.buckets.length === 0) {
-      bucketsList.innerHTML =
-        '<li class="collection-item center-align grey-text">No buckets found</li>';
+      const div = document.createElement("div");
+      div.className = "bucket-item";
+      div.innerHTML = `
+        <div class="text-center" style="padding: 2rem; color: #64748b;">
+          <i class="material-icons" style="font-size: 2rem; margin-bottom: 0.5rem;">folder_open</i>
+          <p>No buckets found</p>
+        </div>
+      `;
+      bucketsList.appendChild(div);
       return;
     }
 
     this.buckets.forEach((bucket) => {
-      const li = document.createElement("li");
-      li.className = "collection-item";
-      li.setAttribute("data-bucket", bucket.Name);
+      const div = document.createElement("div");
+      div.className = "bucket-item";
+      div.setAttribute("data-bucket", bucket.Name);
+      div.onclick = () => this.selectBucket(bucket.Name);
 
-      li.innerHTML = `
-                <div class="bucket-name">
-                    <i class="material-icons">folder</i>
-                    <span>${bucket.Name}</span>
-                </div>
-                <div class="bucket-actions">
-                    <button class="btn-small blue waves-effect" onclick="s3Browser.selectBucket('${bucket.Name}')">
-                        <i class="material-icons">folder_open</i>
-                    </button>
-                    <button class="btn-small red waves-effect" onclick="s3Browser.deleteBucket('${bucket.Name}')">
-                        <i class="material-icons">delete</i>
-                    </button>
-                </div>
-            `;
+      div.innerHTML = `
+        <i class="material-icons">folder</i>
+        <div style="flex: 1;">
+          <div class="bucket-name">${bucket.Name}</div>
+          <div class="bucket-date">${this.formatDate(bucket.CreationDate)}</div>
+        </div>
+        <div class="bucket-actions">
+          <button class="btn-icon" onclick="event.stopPropagation(); fileExplorer.deleteBucket('${
+            bucket.Name
+          }')" title="Delete">
+            <i class="material-icons">delete</i>
+          </button>
+        </div>
+      `;
 
-      bucketsList.appendChild(li);
+      bucketsList.appendChild(div);
     });
   }
 
-  renderObjects(objects) {
-    const objectsContainer = document.getElementById("objects-container");
-    const noBucketSelected = document.getElementById("no-bucket-selected");
-    const objectsList = document.getElementById("objects-list");
+  renderFiles(files) {
+    const filesBody = document.getElementById("files-body");
+    filesBody.innerHTML = "";
 
-    if (!this.currentBucket) {
-      objectsContainer.classList.add("hide");
-      noBucketSelected.classList.remove("hide");
+    if (files.length === 0) {
+      filesBody.innerHTML = `
+        <div style="padding: 2rem; text-align: center; color: #64748b;">
+          <i class="material-icons" style="font-size: 3rem; margin-bottom: 1rem;">description</i>
+          <p>No files found in this bucket</p>
+        </div>
+      `;
       return;
     }
 
-    noBucketSelected.classList.add("hide");
-    objectsContainer.classList.remove("hide");
-    objectsList.innerHTML = "";
+    files.forEach((file) => {
+      const div = document.createElement("div");
+      div.className = "file-item";
 
-    if (objects.length === 0) {
-      objectsList.innerHTML = `
-                <tr>
-                    <td colspan="4" class="center-align grey-text">No objects found in this bucket</td>
-                </tr>
-            `;
-      return;
-    }
+      div.innerHTML = `
+        <div class="file-name">
+          <i class="material-icons">description</i>
+          <span>${file.Key}</span>
+        </div>
+        <div class="file-size">${this.formatFileSize(file.Size)}</div>
+        <div class="file-date">${this.formatDate(file.LastModified)}</div>
+        <div class="file-actions">
+          <button class="btn-download" onclick="fileExplorer.downloadFile('${
+            this.currentBucket
+          }', '${file.Key}')" title="Download">
+            Download
+          </button>
+          <button class="btn-delete" onclick="fileExplorer.deleteObject('${
+            this.currentBucket
+          }', '${file.Key}')" title="Delete">
+            Delete
+          </button>
+        </div>
+      `;
 
-    objects.forEach((obj) => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-                <td>
-                    <div class="object-name">
-                        <i class="material-icons">description</i>
-                        <span class="text-truncate">${obj.Key}</span>
-                    </div>
-                </td>
-                <td class="object-size">${this.formatFileSize(obj.Size)}</td>
-                <td class="object-date">${this.formatDate(
-                  obj.LastModified
-                )}</td>
-                <td>
-                    <div class="object-actions">
-                        <button class="btn-small green waves-effect" onclick="s3Browser.downloadFile('${
-                          this.currentBucket
-                        }', '${obj.Key}')">
-                            <i class="material-icons">cloud_download</i>
-                        </button>
-                        <button class="btn-small red waves-effect" onclick="s3Browser.deleteObject('${
-                          this.currentBucket
-                        }', '${obj.Key}')">
-                            <i class="material-icons">delete</i>
-                        </button>
-                    </div>
-                </td>
-            `;
-      objectsList.appendChild(tr);
+      filesBody.appendChild(div);
     });
   }
 
   updateCurrentBucketDisplay() {
-    const currentBucketSpan = document.getElementById("current-bucket");
-    currentBucketSpan.textContent = this.currentBucket
-      ? ` - ${this.currentBucket}`
-      : "";
+    const currentBucketSpan = document.getElementById("current-bucket-name");
+    if (currentBucketSpan) {
+      currentBucketSpan.textContent = this.currentBucket || "Select a bucket";
+    }
   }
 
-  showUploadSection() {
-    document.getElementById("upload-section").classList.remove("hide");
+  showEmptyState() {
+    const emptyState = document.getElementById("no-bucket-selected");
+    const filesContainer = document.getElementById("files-container");
+
+    emptyState.classList.remove("hide");
+    filesContainer.classList.add("hide");
   }
 
-  hideUploadSection() {
-    document.getElementById("upload-section").classList.add("hide");
-  }
+  hideEmptyState() {
+    const emptyState = document.getElementById("no-bucket-selected");
+    const filesContainer = document.getElementById("files-container");
 
-  showConnectionStatus(message, type) {
-    const statusDiv = document.getElementById("connection-status");
-    const messageSpan = document.getElementById("connection-message");
-
-    messageSpan.textContent = message;
-    statusDiv.className = `card-panel ${type}`;
-    statusDiv.classList.remove("hide");
-
-    // Auto-hide after 5 seconds
-    setTimeout(() => {
-      statusDiv.classList.add("hide");
-    }, 5000);
+    emptyState.classList.add("hide");
+    filesContainer.classList.remove("hide");
   }
 
   showLoading(message) {
-    const modal = M.Modal.getInstance(document.getElementById("loading-modal"));
-    document.getElementById("loading-message").textContent = message;
-    modal.open();
+    const modal = document.getElementById("loading-modal");
+    const messageEl = document.getElementById("loading-message");
+    messageEl.textContent = message;
+    modal.classList.remove("hide");
   }
 
   hideLoading() {
-    const modal = M.Modal.getInstance(document.getElementById("loading-modal"));
-    modal.close();
+    const modal = document.getElementById("loading-modal");
+    modal.classList.add("hide");
+  }
+
+  showModal(modalId) {
+    const modal = document.getElementById(modalId);
+    modal.classList.remove("hide");
+  }
+
+  hideModal(modalId) {
+    const modal = document.getElementById(modalId);
+    modal.classList.add("hide");
   }
 
   showConfirmDialog(title, message) {
     return new Promise((resolve) => {
-      const modal = M.Modal.getInstance(
-        document.getElementById("confirm-modal")
-      );
+      const modal = document.getElementById("confirm-modal");
       document.getElementById("confirm-title").textContent = title;
       document.getElementById("confirm-message").textContent = message;
 
       const confirmButton = document.getElementById("confirm-action");
+      const cancelButton = document.getElementById("confirm-cancel");
+
+      // Clean up previous event listeners
       const newConfirmButton = confirmButton.cloneNode(true);
+      const newCancelButton = cancelButton.cloneNode(true);
       confirmButton.parentNode.replaceChild(newConfirmButton, confirmButton);
+      cancelButton.parentNode.replaceChild(newCancelButton, cancelButton);
 
       newConfirmButton.addEventListener("click", () => {
+        this.hideModal("confirm-modal");
         resolve(true);
       });
 
-      // Handle cancel/close
-      const cancelButtons = document.querySelectorAll(
-        "#confirm-modal .modal-close"
-      );
-      cancelButtons.forEach((button) => {
-        if (button !== newConfirmButton) {
-          button.addEventListener(
-            "click",
-            () => {
-              resolve(false);
-            },
-            { once: true }
-          );
-        }
+      newCancelButton.addEventListener("click", () => {
+        this.hideModal("confirm-modal");
+        resolve(false);
       });
 
-      modal.open();
+      this.showModal("confirm-modal");
     });
   }
 
-  showToast(message, className = "blue") {
-    M.toast({ html: message, classes: className, displayLength: 4000 });
+  showToast(message, type = "success") {
+    const container = document.getElementById("toast-container");
+    const toast = document.createElement("div");
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+
+    container.appendChild(toast);
+
+    setTimeout(() => {
+      toast.remove();
+    }, 4000);
   }
 
   isValidBucketName(name) {
@@ -469,10 +481,14 @@ class S3Browser {
   }
 
   formatDate(dateString) {
+    if (!dateString) return "N/A";
     const date = new Date(dateString);
     return date.toLocaleDateString() + " " + date.toLocaleTimeString();
   }
 }
+
+// Initialize the application
+const fileExplorer = new S3FileExplorer();
 
 // Initialize the application when DOM is loaded
 document.addEventListener("DOMContentLoaded", () => {

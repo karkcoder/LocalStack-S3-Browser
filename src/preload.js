@@ -23,4 +23,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
 
   // Connection test
   testConnection: () => ipcRenderer.invoke("test-connection"),
+
+  // Connection settings
+  updateConnectionSettings: (settings) =>
+    ipcRenderer.invoke("update-connection-settings", settings),
 });

@@ -164,6 +164,18 @@ class ElectronApp {
         throw new Error(`Connection test failed: ${error.message}`);
       }
     });
+
+    // Update connection settings
+    ipcMain.handle("update-connection-settings", async (event, settings) => {
+      try {
+        this.s3Service.updateConnectionSettings(settings);
+        return { success: true };
+      } catch (error) {
+        throw new Error(
+          `Failed to update connection settings: ${error.message}`
+        );
+      }
+    });
   }
 }
 

@@ -15,20 +15,39 @@ const Validator = require("../utils/validator");
 
 class S3Service {
   constructor() {
+    this.connectionSettings = {
+      endpoint: "http://localhost:4566",
+      region: "us-east-1",
+      accessKeyId: "test",
+      secretAccessKey: "test",
+    };
     this.client = this.createS3Client();
   }
 
-  createS3Client() {
+  createS3Client(settings = this.connectionSettings) {
     return new S3Client({
-      endpoint: "http://localhost:4566", // LocalStack endpoint
-      region: "us-east-1",
+      endpoint: settings.endpoint,
+      region: settings.region,
       credentials: {
-        accessKeyId: "test",
-        secretAccessKey: "test",
+        accessKeyId: settings.accessKeyId,
+        secretAccessKey: settings.secretAccessKey,
       },
       forcePathStyle: true, // Required for LocalStack
       tls: false,
     });
+  }
+
+  updateConnectionSettings(settings) {
+    this.connectionSettings = {
+      endpoint: settings.endpoint || this.connectionSettings.endpoint,
+      region: settings.region || this.connectionSettings.region,
+      accessKeyId: settings.accessKey || this.connectionSettings.accessKeyId,
+      secretAccessKey:
+        settings.secretKey || this.connectionSettings.secretAccessKey,
+    };
+
+    // Recreate client with new settings
+    this.client = this.createS3Client(this.connectionSettings);
   }
 
   async testConnection() {
