@@ -12,6 +12,20 @@ class ElectronApp {
   }
 
   setupApp() {
+    // Disable hardware acceleration to prevent GPU process crashes
+    app.disableHardwareAcceleration();
+
+    // Additional GPU-related command line switches for Windows compatibility
+    app.commandLine.appendSwitch("--no-sandbox");
+    app.commandLine.appendSwitch("--disable-gpu-sandbox");
+    app.commandLine.appendSwitch("--disable-software-rasterizer");
+
+    // Optional: completely disable GPU if still having issues
+    if (process.env.DISABLE_GPU === "true") {
+      app.commandLine.appendSwitch("--disable-gpu");
+      app.commandLine.appendSwitch("--disable-gpu-compositing");
+    }
+
     app.whenReady().then(() => {
       this.createWindow();
 
@@ -37,6 +51,9 @@ class ElectronApp {
         nodeIntegration: false,
         contextIsolation: true,
         preload: path.join(__dirname, "src", "preload.js"),
+        webSecurity: true,
+        enableRemoteModule: false,
+        experimentalFeatures: false,
       },
       icon: path.join(__dirname, "assets", "icon.png"),
       titleBarStyle: "default",

@@ -4,8 +4,10 @@
   "description": "Electron app to manage S3 buckets and files using LocalStack",
   "main": "main.js",
   "scripts": {
-    "start": "electron .",
-    "dev": "electron . --dev",
+    "start": "electron . --no-sandbox --disable-gpu-sandbox",
+    "dev": "electron . --dev --no-sandbox --disable-gpu-sandbox",
+    "start:safe": "electron . --disable-gpu --no-sandbox --disable-dev-shm-usage",
+    "dev:safe": "electron . --dev --disable-gpu --no-sandbox --disable-dev-shm-usage",
     "pack": "electron-builder",
     "dist": "electron-builder --publish=never",
     "localstack:start": "docker-compose up -d",
