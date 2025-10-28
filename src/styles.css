@@ -611,3 +611,75 @@ body {
 .gap-4 {
   gap: 1rem;
 }
+
+/* Tag Tooltip Styles */
+.tag-tooltip {
+  position: fixed;
+  background: #1e293b;
+  color: white;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  z-index: 1200;
+  max-width: 300px;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+  pointer-events: none;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.tooltip-header {
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.tooltip-header strong {
+  display: block;
+  color: #f1f5f9;
+  font-weight: 600;
+  word-break: break-all;
+}
+
+.tooltip-content {
+  color: #cbd5e1;
+}
+
+.tags-label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: #e2e8f0;
+}
+
+.tag-item {
+  display: flex;
+  margin-bottom: 0.25rem;
+  align-items: baseline;
+  gap: 0.25rem;
+}
+
+.tag-item:last-child {
+  margin-bottom: 0;
+}
+
+.tag-key {
+  font-weight: 500;
+  color: #60a5fa;
+  min-width: fit-content;
+}
+
+.tag-value {
+  color: #cbd5e1;
+  word-break: break-all;
+}
+
+/* Hover effect for file names */
+.file-name-text {
+  cursor: pointer;
+  position: relative;
+}
+
+.file-name:hover .file-name-text {
+  color: #3b82f6;
+}

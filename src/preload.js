@@ -17,6 +17,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
     ipcRenderer.invoke("download-file", bucketName, key),
   deleteObject: (bucketName, key) =>
     ipcRenderer.invoke("delete-object", bucketName, key),
+  getObjectTags: (bucketName, key) =>
+    ipcRenderer.invoke("get-object-tags", bucketName, key),
 
   // File dialog
   showOpenDialog: () => ipcRenderer.invoke("show-open-dialog"),

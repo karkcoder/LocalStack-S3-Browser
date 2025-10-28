@@ -8,6 +8,7 @@ const {
   GetObjectCommand,
   DeleteObjectCommand,
   HeadBucketCommand,
+  GetObjectTaggingCommand,
 } = require("@aws-sdk/client-s3");
 
 const Logger = require("../utils/logger");
@@ -227,6 +228,33 @@ class S3Service {
       console.error("Error deleting object:", error);
       if (error.name === "NoSuchBucket") {
         throw new Error(`Bucket "${bucketName}" does not exist`);
+      }
+      throw error;
+    }
+  }
+
+  async getObjectTags(bucketName, key) {
+    try {
+      const command = new GetObjectTaggingCommand({
+        Bucket: bucketName,
+        Key: key,
+      });
+
+      const response = await this.client.send(command);
+      return response.TagSet || [];
+    } catch (error) {
+      console.error("Error getting object tags:", error);
+      if (error.name === "NoSuchBucket") {
+        throw new Error(`Bucket "${bucketName}" does not exist`);
+      }
+      if (error.name === "NoSuchKey") {
+        throw new Error(
+          `Object "${key}" does not exist in bucket "${bucketName}"`
+        );
+      }
+      // If no tags exist, return empty array instead of throwing error
+      if (error.name === "NoSuchTagSet") {
+        return [];
       }
       throw error;
     }

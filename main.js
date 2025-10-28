@@ -182,6 +182,14 @@ class ElectronApp {
       }
     });
 
+    ipcMain.handle("get-object-tags", async (event, bucketName, key) => {
+      try {
+        return await this.s3Service.getObjectTags(bucketName, key);
+      } catch (error) {
+        throw new Error(`Failed to get object tags: ${error.message}`);
+      }
+    });
+
     // File dialog operations
     ipcMain.handle("show-open-dialog", async () => {
       try {

@@ -355,9 +355,11 @@ class S3FileExplorer {
       div.className = "file-item";
 
       div.innerHTML = `
-        <div class="file-name">
+        <div class="file-name" data-bucket="${this.currentBucket}" data-key="${
+        file.Key
+      }">
           <i class="material-icons">description</i>
-          <span>${file.Key}</span>
+          <span class="file-name-text">${file.Key}</span>
         </div>
         <div class="file-size">${this.formatFileSize(file.Size)}</div>
         <div class="file-date">${this.formatDate(file.LastModified)}</div>
@@ -375,8 +377,129 @@ class S3FileExplorer {
         </div>
       `;
 
+      // Add hover event listeners for tag display
+      const fileNameDiv = div.querySelector(".file-name");
+      this.setupTagHover(fileNameDiv);
+
       filesBody.appendChild(div);
     });
+  }
+
+  setupTagHover(fileNameElement) {
+    let hoverTimeout;
+    let tooltip;
+
+    fileNameElement.addEventListener("mouseenter", (e) => {
+      const bucketName = e.target.closest(".file-name").dataset.bucket;
+      const objectKey = e.target.closest(".file-name").dataset.key;
+
+      // Clear any existing timeout
+      if (hoverTimeout) {
+        clearTimeout(hoverTimeout);
+      }
+
+      // Show tooltip after a short delay
+      hoverTimeout = setTimeout(async () => {
+        try {
+          const tags = await window.electronAPI.getObjectTags(
+            bucketName,
+            objectKey
+          );
+          this.showTagTooltip(e.target, tags, objectKey);
+        } catch (error) {
+          console.error("Error fetching tags:", error);
+          // Show tooltip indicating no tags or error
+          this.showTagTooltip(e.target, [], objectKey, "No tags available");
+        }
+      }, 500); // 500ms delay before showing tooltip
+    });
+
+    fileNameElement.addEventListener("mouseleave", () => {
+      // Clear timeout if mouse leaves before tooltip is shown
+      if (hoverTimeout) {
+        clearTimeout(hoverTimeout);
+      }
+      // Hide tooltip
+      this.hideTagTooltip();
+    });
+  }
+
+  showTagTooltip(targetElement, tags, objectKey, errorMessage = null) {
+    // Remove any existing tooltip
+    this.hideTagTooltip();
+
+    const tooltip = document.createElement("div");
+    tooltip.className = "tag-tooltip";
+    tooltip.id = "tag-tooltip";
+
+    if (errorMessage) {
+      tooltip.innerHTML = `
+        <div class="tooltip-header">
+          <strong>${objectKey}</strong>
+        </div>
+        <div class="tooltip-content">
+          <em>${errorMessage}</em>
+        </div>
+      `;
+    } else if (tags.length === 0) {
+      tooltip.innerHTML = `
+        <div class="tooltip-header">
+          <strong>${objectKey}</strong>
+        </div>
+        <div class="tooltip-content">
+          <em>No tags</em>
+        </div>
+      `;
+    } else {
+      const tagsList = tags
+        .map(
+          (tag) =>
+            `<div class="tag-item">
+          <span class="tag-key">${tag.Key}:</span>
+          <span class="tag-value">${tag.Value}</span>
+        </div>`
+        )
+        .join("");
+
+      tooltip.innerHTML = `
+        <div class="tooltip-header">
+          <strong>${objectKey}</strong>
+        </div>
+        <div class="tooltip-content">
+          <div class="tags-label">Tags:</div>
+          ${tagsList}
+        </div>
+      `;
+    }
+
+    document.body.appendChild(tooltip);
+
+    // Position tooltip
+    const rect = targetElement.getBoundingClientRect();
+    const tooltipRect = tooltip.getBoundingClientRect();
+
+    let left = rect.left + rect.width / 2 - tooltipRect.width / 2;
+    let top = rect.top - tooltipRect.height - 8;
+
+    // Adjust if tooltip would go off-screen
+    if (left < 8) left = 8;
+    if (left + tooltipRect.width > window.innerWidth - 8) {
+      left = window.innerWidth - tooltipRect.width - 8;
+    }
+    if (top < 8) {
+      top = rect.bottom + 8; // Show below if no room above
+    }
+
+    tooltip.style.left = `${left}px`;
+    tooltip.style.top = `${top}px`;
+    tooltip.style.opacity = "1";
+  }
+
+  hideTagTooltip() {
+    const existingTooltip = document.getElementById("tag-tooltip");
+    if (existingTooltip) {
+      existingTooltip.remove();
+    }
   }
 
   updateCurrentBucketDisplay() {
