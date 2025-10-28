@@ -183,7 +183,6 @@ class S3FileExplorer {
       console.error("Error deleting bucket:", error);
     }
   }
-
   async selectBucket(bucketName) {
     this.currentBucket = bucketName;
     this.updateCurrentBucketDisplay();
@@ -324,13 +323,18 @@ class S3FileExplorer {
           <div class="bucket-date">${this.formatDate(bucket.CreationDate)}</div>
         </div>
         <div class="bucket-actions">
-          <button class="btn-icon" onclick="event.stopPropagation(); fileExplorer.deleteBucket('${
-            bucket.Name
-          }')" title="Delete">
+          <button class="btn-icon delete-bucket-btn" title="Delete">
             <i class="material-icons">delete</i>
           </button>
         </div>
       `;
+
+      // Add event listener for delete button
+      const deleteBtn = div.querySelector(".delete-bucket-btn");
+      deleteBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        this.deleteBucket(bucket.Name);
+      });
 
       bucketsList.appendChild(div);
     });
@@ -364,18 +368,26 @@ class S3FileExplorer {
         <div class="file-size">${this.formatFileSize(file.Size)}</div>
         <div class="file-date">${this.formatDate(file.LastModified)}</div>
         <div class="file-actions">
-          <button class="btn-download" onclick="fileExplorer.downloadFile('${
-            this.currentBucket
-          }', '${file.Key}')" title="Download">
+          <button class="btn-download download-file-btn" title="Download">
             Download
           </button>
-          <button class="btn-delete" onclick="fileExplorer.deleteObject('${
-            this.currentBucket
-          }', '${file.Key}')" title="Delete">
+          <button class="btn-delete delete-file-btn" title="Delete">
             Delete
           </button>
         </div>
       `;
+
+      // Add event listeners for action buttons
+      const downloadBtn = div.querySelector(".download-file-btn");
+      const deleteBtn = div.querySelector(".delete-file-btn");
+
+      downloadBtn.addEventListener("click", () => {
+        this.downloadFile(this.currentBucket, file.Key);
+      });
+
+      deleteBtn.addEventListener("click", () => {
+        this.deleteObject(this.currentBucket, file.Key);
+      });
 
       // Add hover event listeners for tag display
       const fileNameDiv = div.querySelector(".file-name");
@@ -612,5 +624,5 @@ class S3FileExplorer {
 
 // Initialize the application when DOM is loaded
 document.addEventListener("DOMContentLoaded", () => {
-  window.s3Browser = new S3FileExplorer();
+  window.fileExplorer = new S3FileExplorer();
 });
