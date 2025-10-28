@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "localstack:start": "docker-compose up -d",
+    "localstack:stop": "docker-compose down",
+    "localstack:logs": "docker-compose logs -f localstack",
+    "setup": "npm install && npm run localstack:start",
+    "clean": "npm run localstack:stop && docker system prune -f"
+  }
+}

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LocalStack S3 Browser</title>
+
+    <!-- Material Design CSS -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- Header -->
+    <nav class="blue darken-3">
+      <div class="nav-wrapper">
+        <a href="#" class="brand-logo center">
+          <i class="material-icons left">storage</i>
+          LocalStack S3 Browser
+        </a>
+        <ul class="right">
+          <li>
+            <a href="#" id="test-connection" class="waves-effect waves-light">
+              <i class="material-icons left">wifi</i>
+              Test Connection
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Connection Status -->
+    <div id="connection-status" class="card-panel hide">
+      <span id="connection-message"></span>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+      <div class="row">
+        <!-- Buckets Section -->
+        <div class="col s12 m4">
+          <div class="card">
+            <div class="card-content">
+              <span class="card-title">
+                <i class="material-icons left">folder</i>
+                Buckets
+              </span>
+
+              <!-- Create Bucket Form -->
+              <div class="row">
+                <div class="input-field col s12">
+                  <input id="bucket-name" type="text" class="validate" />
+                  <label for="bucket-name">Bucket Name</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col s6">
+                  <button
+                    id="create-bucket"
+                    class="btn waves-effect waves-light green"
+                  >
+                    <i class="material-icons left">add</i>
+                    Create
+                  </button>
+                </div>
+                <div class="col s6">
+                  <button
+                    id="refresh-buckets"
+                    class="btn waves-effect waves-light blue"
+                  >
+                    <i class="material-icons left">refresh</i>
+                    Refresh
+                  </button>
+                </div>
+              </div>
+
+              <!-- Buckets List -->
+              <div class="section">
+                <h6>Existing Buckets</h6>
+                <ul id="buckets-list" class="collection">
+                  <!-- Buckets will be populated here -->
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Objects Section -->
+        <div class="col s12 m8">
+          <div class="card">
+            <div class="card-content">
+              <span class="card-title">
+                <i class="material-icons left">description</i>
+                Objects
+                <span
+                  id="current-bucket"
+                  class="grey-text text-lighten-1"
+                ></span>
+              </span>
+
+              <!-- Upload Section -->
+              <div id="upload-section" class="hide">
+                <div class="row">
+                  <div class="input-field col s8">
+                    <input id="object-key" type="text" class="validate" />
+                    <label for="object-key"
+                      >Object Key (optional - will use filename if empty)</label
+                    >
+                  </div>
+                  <div class="col s4">
+                    <button
+                      id="upload-file"
+                      class="btn waves-effect waves-light orange"
+                    >
+                      <i class="material-icons left">cloud_upload</i>
+                      Upload
+                    </button>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col s12">
+                    <button
+                      id="refresh-objects"
+                      class="btn waves-effect waves-light blue"
+                    >
+                      <i class="material-icons left">refresh</i>
+                      Refresh Objects
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Objects List -->
+              <div class="section">
+                <div id="no-bucket-selected" class="center-align">
+                  <i class="material-icons large grey-text text-lighten-2"
+                    >folder_open</i
+                  >
+                  <p class="grey-text">Select a bucket to view objects</p>
+                </div>
+                <div id="objects-container" class="hide">
+                  <table id="objects-table" class="striped responsive-table">
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Size</th>
+                        <th>Last Modified</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="objects-list">
+                      <!-- Objects will be populated here -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading Modal -->
+    <div id="loading-modal" class="modal">
+      <div class="modal-content center">
+        <div class="preloader-wrapper big active">
+          <div class="spinner-layer spinner-blue-only">
+            <div class="circle-clipper left">
+              <div class="circle"></div>
+            </div>
+            <div class="gap-patch">
+              <div class="circle"></div>
+            </div>
+            <div class="circle-clipper right">
+              <div class="circle"></div>
+            </div>
+          </div>
+        </div>
+        <p id="loading-message">Processing...</p>
+      </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirm-modal" class="modal">
+      <div class="modal-content">
+        <h4 id="confirm-title">Confirm Action</h4>
+        <p id="confirm-message">Are you sure you want to proceed?</p>
+      </div>
+      <div class="modal-footer">
+        <a href="#" class="modal-close waves-effect waves-light btn-flat"
+          >Cancel</a
+        >
+        <a
+          href="#"
+          id="confirm-action"
+          class="modal-close waves-effect waves-light btn red"
+          >Confirm</a
+        >
+      </div>
+    </div>
+
+    <!-- Toast container for notifications -->
+    <div id="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="renderer.js"></script>
+  </body>
+</html>

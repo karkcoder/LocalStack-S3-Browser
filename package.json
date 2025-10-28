@@ -1,0 +1,51 @@
+{
+  "name": "localstack-s3-browser",
+  "version": "1.0.0",
+  "description": "Electron app to manage S3 buckets and files using LocalStack",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "pack": "electron-builder",
+    "dist": "electron-builder --publish=never",
+    "localstack:start": "docker-compose up -d",
+    "localstack:stop": "docker-compose down",
+    "localstack:logs": "docker-compose logs -f localstack",
+    "setup": "npm install && npm run localstack:start",
+    "clean": "npm run localstack:stop && docker system prune -f"
+  },
+  "keywords": [
+    "electron",
+    "localstack",
+    "s3",
+    "browser",
+    "aws"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^27.0.0",
+    "electron-builder": "^24.6.4"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.445.0",
+    "@aws-sdk/s3-request-presigner": "^3.445.0",
+    "@material-ui/core": "^4.12.4",
+    "@material-ui/icons": "^4.11.3",
+    "@material-ui/lab": "^4.0.0-alpha.61",
+    "react": "^17.0.0",
+    "react-dom": "^17.0.0"
+  },
+  "build": {
+    "appId": "com.localstack.s3browser",
+    "productName": "LocalStack S3 Browser",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "src/**/*",
+      "node_modules/**/*"
+    ]
+  }
+}

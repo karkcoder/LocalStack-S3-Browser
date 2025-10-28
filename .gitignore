@@ -137,3 +137,11 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# LocalStack specific
+localstack-data/
+
+# Electron build directories
+build/
+dist/
+out/
