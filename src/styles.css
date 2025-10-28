@@ -12,6 +12,9 @@ body {
   background-color: #f8fafc;
   color: #334155;
   line-height: 1.6;
+  width: 100vw;
+  height: 100vh;
+  overflow-x: hidden;
 }
 
 /* Header */
@@ -42,20 +45,20 @@ body {
 /* Connection Settings */
 .connection-settings {
   background: white;
-  padding: 1.5rem 2rem;
+  padding: 1rem 2rem;
   border-bottom: 1px solid #e2e8f0;
 }
 
 .connection-settings h2 {
   font-size: 1.125rem;
   font-weight: 600;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
   color: #1e293b;
 }
 
 .settings-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) auto;
+  grid-template-columns: 1fr 1fr 1fr 1fr auto;
   gap: 1rem;
   align-items: end;
   max-width: 1400px;
@@ -105,16 +108,18 @@ body {
 
 /* Main Content */
 .main-content {
-  padding: 2rem;
-  max-width: 1400px;
-  margin: 0 auto;
+  padding: 1.5rem;
+  width: 100%;
+  margin: 0;
+  flex: 1;
 }
 
 .content-grid {
   display: grid;
-  grid-template-columns: 300px 1fr;
+  grid-template-columns: 350px 1fr;
   gap: 2rem;
-  height: calc(100vh - 200px);
+  height: calc(100vh - 180px);
+  min-height: 500px;
 }
 
 /* Panels */
@@ -200,6 +205,10 @@ body {
   cursor: pointer;
   transition: background-color 0.2s;
   white-space: nowrap;
+  min-width: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-create:hover {
@@ -525,7 +534,25 @@ body {
   }
 }
 
-/* Responsive Design */
+/* Desktop optimizations */
+@media (min-width: 1200px) {
+  .content-grid {
+    grid-template-columns: 400px 1fr;
+  }
+
+  .settings-grid {
+    grid-template-columns: 1fr 1fr 1fr 1fr auto;
+    gap: 1.5rem;
+  }
+}
+
+@media (min-width: 1600px) {
+  .content-grid {
+    grid-template-columns: 450px 1fr;
+  }
+}
+
+/* Responsive Design for smaller screens (mobile/tablet) */
 @media (max-width: 768px) {
   .settings-grid {
     grid-template-columns: 1fr;
@@ -553,6 +580,10 @@ body {
   .file-size,
   .file-date {
     display: none;
+  }
+
+  .main-content {
+    padding: 1rem;
   }
 }
 

@@ -1,3 +1,6 @@
+// Load GPU-disabled configuration FIRST, before any other imports
+require("./src/config/electron-config");
+
 const { app, BrowserWindow, ipcMain, dialog } = require("electron");
 const path = require("path");
 const fs = require("fs").promises;
@@ -12,19 +15,43 @@ class ElectronApp {
   }
 
   setupApp() {
-    // Disable hardware acceleration to prevent GPU process crashes
+    // PERMANENTLY DISABLE ALL GPU ACCELERATION
+    // This must be called before app.whenReady()
     app.disableHardwareAcceleration();
 
-    // Additional GPU-related command line switches for Windows compatibility
-    app.commandLine.appendSwitch("--no-sandbox");
+    // Comprehensive GPU disabling - most aggressive approach
+    app.commandLine.appendSwitch("--disable-gpu");
+    app.commandLine.appendSwitch("--disable-gpu-compositing");
+    app.commandLine.appendSwitch("--disable-gpu-rasterization");
     app.commandLine.appendSwitch("--disable-gpu-sandbox");
     app.commandLine.appendSwitch("--disable-software-rasterizer");
+    app.commandLine.appendSwitch("--disable-gpu-memory-buffer-compositor");
+    app.commandLine.appendSwitch("--disable-gpu-memory-buffer-video-frames");
+    app.commandLine.appendSwitch("--disable-2d-canvas-image-chromium");
+    app.commandLine.appendSwitch("--disable-accelerated-2d-canvas");
+    app.commandLine.appendSwitch("--disable-accelerated-jpeg-decoding");
+    app.commandLine.appendSwitch("--disable-accelerated-mjpeg-decode");
+    app.commandLine.appendSwitch("--disable-accelerated-video-decode");
+    app.commandLine.appendSwitch("--disable-accelerated-video-encode");
+    app.commandLine.appendSwitch("--disable-gpu-process-crash-limit");
 
-    // Optional: completely disable GPU if still having issues
-    if (process.env.DISABLE_GPU === "true") {
-      app.commandLine.appendSwitch("--disable-gpu");
-      app.commandLine.appendSwitch("--disable-gpu-compositing");
-    }
+    // Force software-only rendering
+    app.commandLine.appendSwitch("--use-gl", "disabled");
+    app.commandLine.appendSwitch(
+      "--disable-features",
+      "VizDisplayCompositor,VizHitTestSurfaceLayer"
+    );
+
+    // Sandbox and security switches
+    app.commandLine.appendSwitch("--no-sandbox");
+    app.commandLine.appendSwitch("--disable-dev-shm-usage");
+    app.commandLine.appendSwitch("--disable-extensions");
+
+    // Additional stability switches
+    app.commandLine.appendSwitch("--disable-background-timer-throttling");
+    app.commandLine.appendSwitch("--disable-renderer-backgrounding");
+    app.commandLine.appendSwitch("--disable-backgrounding-occluded-windows");
+    app.commandLine.appendSwitch("--disable-ipc-flooding-protection");
 
     app.whenReady().then(() => {
       this.createWindow();
@@ -44,9 +71,16 @@ class ElectronApp {
   }
 
   createWindow() {
+    // Get screen dimensions
+    const { screen } = require("electron");
+    const primaryDisplay = screen.getPrimaryDisplay();
+    const { width, height } = primaryDisplay.workAreaSize;
+
     this.mainWindow = new BrowserWindow({
-      width: 1200,
-      height: 800,
+      width: Math.floor(width * 0.9), // Use 90% of screen width
+      height: Math.floor(height * 0.9), // Use 90% of screen height
+      minWidth: 1000, // Minimum width for desktop functionality
+      minHeight: 700, // Minimum height for desktop functionality
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,
@@ -54,10 +88,15 @@ class ElectronApp {
         webSecurity: true,
         enableRemoteModule: false,
         experimentalFeatures: false,
+        // Explicitly disable hardware acceleration in webPreferences
+        hardwareAcceleration: false,
+        // Disable GPU-related features
+        offscreen: false,
       },
-      icon: path.join(__dirname, "assets", "icon.png"),
+      // icon: path.join(__dirname, "assets", "icon.png"), // Icon removed temporarily
       titleBarStyle: "default",
       show: false,
+      center: true, // Center the window on screen
     });
 
     this.mainWindow.loadFile("src/index.html");

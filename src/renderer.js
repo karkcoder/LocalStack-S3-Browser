@@ -487,10 +487,7 @@ class S3FileExplorer {
   }
 }
 
-// Initialize the application
-const fileExplorer = new S3FileExplorer();
-
 // Initialize the application when DOM is loaded
 document.addEventListener("DOMContentLoaded", () => {
-  window.s3Browser = new S3Browser();
+  window.s3Browser = new S3FileExplorer();
 });
